@@ -10,7 +10,6 @@ from models.place import Place
 def places(city_id):
     """get City with his id"""
     for val in storage.all("City").values():
-        print(val.id, city_id)
         if val.id == city_id:
             return jsonify(list(map(lambda v: v.to_dict(), val.places)))
     abort(404)
@@ -23,6 +22,43 @@ def place_id(place_id):
         if val.id == place_id:
             return jsonify(val.to_dict())
     abort(404)
+
+
+@app_views.route('/places_search')
+def place_search():
+    """get City with his id"""
+    list_places = []
+
+    if request.is_json:
+        data = request.get_json()
+    else:
+        msg = "Not a JSON"
+        return jsonify({"error": msg}), 400
+
+    if len(data) == 0:
+        for val in storage.all("Place").values():
+            list_places.append(val.to_dict())
+    else:
+        if "states" in data and len(data["states"]) > 0:
+            for state_id in data["states"]:
+                place = storage.get("State", state_id)
+                for city in place.cities:
+                    for pla in city.places:
+                        list_places.append(pla.to_dict())
+
+        if "cities" in data and len(data["cities"]) > 0:
+            for city_id in data["cities"]:
+                city = storage.get("City", city_id)
+                for pla in city.places:
+                    list_places.append(pla.to_dict())
+
+        if "amenities" in data and len(data["amenities"]) > 0:
+            for amen_id in data["amenities"]:
+                amen = storage.get("Amenity", amen_id)
+                for pla in amen.place_amenities:
+                    list_places.append(pla.to_dict())
+
+    return jsonify(list_places)
 
 
 @app_views.route('/places/<place_id>', methods=['DELETE'])
