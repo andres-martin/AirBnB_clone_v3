@@ -8,8 +8,10 @@ from models import storage
 from flask import Flask, jsonify
 from api.v1.views import app_views
 from flask_cors import CORS
+from flasgger import Swagger
 app = Flask(__name__)
 app.url_map.strict_slashes = False
+swagger = Swagger(app)
 
 app.register_blueprint(app_views)
 cors = CORS(app, resources={r"/*": {"origins": "0.0.0.0"}})

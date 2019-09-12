@@ -1,0 +1,7 @@
+This is the documentaion for status route
+---
+tags:
+        - description for status
+responses:
+        200:
+                description: Renders Ok status

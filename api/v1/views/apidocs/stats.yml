@@ -1,0 +1,7 @@
+This is the documentaion for stats route
+---
+tags:
+        - stats description
+responses:
+        200:
+                description: Renders stats for all models
