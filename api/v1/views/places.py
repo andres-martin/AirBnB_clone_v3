@@ -53,10 +53,19 @@ def place_search():
                     list_places.append(pla.to_dict())
 
         if "amenities" in data and len(data["amenities"]) > 0:
+            list_amen = []
+            list_pla = []
             for amen_id in data["amenities"]:
+                list_amen.append(amen_id)
                 amen = storage.get("Amenity", amen_id)
                 for pla in amen.place_amenities:
-                    list_places.append(pla.to_dict())
+                    list_pla.append(pla)
+            for pla in list_pla:
+                for amen_ids in pla.amenities:
+                    if amen_ids.id in list_amen:
+                        llaves = pla.to_dict()
+                        del llaves["amenities"]
+                        list_places.append(llaves)
 
     return jsonify(list_places)
 
