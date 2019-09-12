@@ -52,26 +52,14 @@ def amenitie_create(place_id, amenity_id):
     place = storage.get("Place", place_id)
     if place is None or amenity is None:
         abort(404)
-    if request.is_json:
-        data = request.get_json()
-    else:
-        msg = "Not a JSON"
-        return jsonify({"error": msg}), 400
 
     if os.environ.get('HBNB_TYPE_STORAGE') == "db":
         if amenity.id in list(map(lambda x: x.id, place.amenities)):
             return jsonify(amenity.to_dict()), 200
-        data.update({'place_id': place_id})
-        amenity1 = Amenity(**data)
-        place.amenities.append(amenity1)
+        place.amenities.append(amenity)
     else:
         if amenity.id in list(map(lambda x: x.id, place.amenity_ids)):
             return jsonify(amenity.to_dict()), 200
-        data.update({'place_id': place_id})
-        amenity1 = Amenity(**data)
-        place.amenity_ids.append(amenity1.id)
+        place.amenity_ids.append(amenity)
 
-    storage.new(amenity1)
-    storage.save()
-
-    return jsonify({}), 201
+    return jsonify(amenity.to_json()), 201
