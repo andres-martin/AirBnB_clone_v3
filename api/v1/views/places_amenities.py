@@ -61,13 +61,17 @@ def amenitie_create(place_id, amenity_id):
     if os.environ.get('HBNB_TYPE_STORAGE') == "db":
         if amenity.id in list(map(lambda x: x.id, place.amenities)):
             return jsonify(amenity.to_dict()), 200
+        data.update({'place_id': place_id})
+        amenity1 = Amenity(**data)
+        place.amenities.append(amenity1)
     else:
         if amenity.id in list(map(lambda x: x.id, place.amenity_ids)):
             return jsonify(amenity.to_dict()), 200
+        data.update({'place_id': place_id})
+        amenity1 = Amenity(**data)
+        place.amenities.append(amenity1.id)
 
-    data.update({'place_id': place_id})
-    amenity1 = Amenity(**data)
-    place.amenities.append(amenity1)
+
     storage.new(amenity1)
     storage.save()
 
