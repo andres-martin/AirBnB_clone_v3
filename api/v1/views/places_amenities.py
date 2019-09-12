@@ -71,4 +71,4 @@ def amenitie_create(place_id, amenity_id):
     storage.new(amenity1)
     storage.save()
 
-    return jsonify(amenity1.to_dict()), 201
+    return jsonify({}), 201
