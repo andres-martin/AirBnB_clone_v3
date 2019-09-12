@@ -24,7 +24,7 @@ def place_id(place_id):
     abort(404)
 
 
-@app_views.route('/places_search')
+@app_views.route('/places_search', methods=['POST'])
 def place_search():
     """get City with his id"""
     list_places = []
