@@ -69,8 +69,7 @@ def amenitie_create(place_id, amenity_id):
             return jsonify(amenity.to_dict()), 200
         data.update({'place_id': place_id})
         amenity1 = Amenity(**data)
-        place.amenities.append(amenity1.id)
-
+        place.amenity_ids.append(amenity1.id)
 
     storage.new(amenity1)
     storage.save()
