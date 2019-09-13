@@ -62,8 +62,8 @@ def place_search():
 
             for place in list_place:
                 pla_amen = None
-                if (os.environ.get('HBNB_TYPE_STORAGE')
-                        == 'db' and place.amenities):
+                if (os.environ.get('HBNB_TYPE_STORAGE') ==
+                        'db' and place.amenities):
                     pla_amen = list(x.id for x in place.amenities)
                 elif len(place.amenities) > 0:
                     pla_amen = place.amenities
