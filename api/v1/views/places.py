@@ -4,6 +4,7 @@ from api.v1.views import app_views
 from flask import jsonify, abort, request
 from models import storage
 from models.place import Place
+import os
 
 
 @app_views.route('/cities/<city_id>/places')
@@ -28,6 +29,7 @@ def place_id(place_id):
 def place_search():
     """get City with his id"""
     list_places = []
+    list_place = []
 
     if request.is_json:
         data = request.get_json()
@@ -35,6 +37,8 @@ def place_search():
         msg = "Not a JSON"
         return jsonify({"error": msg}), 400
 
+    for val in storage.all("Place").values():
+        list_place.append(val)
     if len(data) == 0:
         for val in storage.all("Place").values():
             list_places.append(val.to_dict())
@@ -53,19 +57,24 @@ def place_search():
                     list_places.append(pla.to_dict())
 
         if "amenities" in data and len(data["amenities"]) > 0:
-            list_amen = []
-            list_pla = []
-            for amen_id in data["amenities"]:
-                list_amen.append(amen_id)
-                amen = storage.get("Amenity", amen_id)
-                for pla in amen.place_amenities:
-                    list_pla.append(pla)
-            for pla in list_pla:
-                for amen_ids in pla.amenities:
-                    if amen_ids.id in list_amen:
-                        llaves = pla.to_dict()
-                        del llaves["amenities"]
-                        list_places.append(llaves)
+            amenities = set(list(a_id for a_id in data["amenities"]
+                                 if storage.get('Amenity', a_id)))
+
+            for place in list_place:
+                pla_amen = None
+                if (os.environ.get('HBNB_TYPE_STORAGE')
+                        == 'db' and place.amenities):
+                    pla_amen = list(x.id for x in place.amenities)
+                elif len(place.amenities) > 0:
+                    pla_amen = place.amenities
+
+                if (pla_amen and all(list(x in pla_amen
+                                          for x in amenities))):
+                    llave = place.to_dict()
+
+                    if "amenities" in llave:
+                        del llave["amenities"]
+                    list_places.append(llave)
 
     return jsonify(list_places)
 
