@@ -31,6 +31,9 @@ def place_search():
     list_places = []
     list_place = []
     list_final = []
+    list_send = []
+
+    lista_ids_pl = set()
 
     if request.is_json:
         data = request.get_json()
@@ -72,21 +75,24 @@ def place_search():
 
                 if (pla_amen and all(list(x in pla_amen
                                           for x in amenities))):
-                    llave = place.to_dict()
-
-                    if "amenities" in llave:
-                        del llave["amenities"]
                     list_places.append(place)
 
-    
+    for pla in list_places:
+        lista_ids_pl.add(pla.id)
+        lista_ids_iter = list(lista_ids_pl)
 
-    for pl in list_places:
+    for pla in list_places:
+        if pla.id in lista_ids_iter:
+            list_final.append(pla)
+            lista_ids_iter.remove(pla.id)
+
+    for pl in list_final:
         llave = pl.to_dict()
         if "amenities" in llave:
             del llave["amenities"]
-        list_final.append(llave)
+        list_send.append(llave)
 
-    return jsonify(list_final)
+    return jsonify(list_send)
 
 
 @app_views.route('/places/<place_id>', methods=['DELETE'])
