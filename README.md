@@ -160,7 +160,7 @@ Jennifer Huang - [Github](https://github.com/jhuang10123) / [Twitter](https://tw
 Second part of Airbnb: Joann Vuong    
 Api v1:
 - Andres Martin
-- Yesid
+- Yesid Gonzalez
 
 ## License
 Public Domain. No copy write protection. 
