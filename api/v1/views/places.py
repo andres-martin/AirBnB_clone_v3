@@ -40,20 +40,31 @@ def place_search():
 
     if len(data) == 0:
         for val in storage.all("Place").values():
-            list_places.append(val.to_dict())
+            list_places.append(val)
     else:
+        lista_ids_pl = set()
         if "states" in data and len(data["states"]) > 0:
             for state_id in data["states"]:
                 place = storage.get("State", state_id)
                 for city in place.cities:
                     for pla in city.places:
-                        list_places.append(pla)
+                        lista_ids_pl.add(pla.id)
+                    lista_ids_iter = list(lista_ids_pl)
+                    for pla in city.places:
+                        if pla.id in lista_ids_iter:
+                            list_places.append(pla)
+                            lista_ids_iter.remove(pla.id)
 
         if "cities" in data and len(data["cities"]) > 0:
             for city_id in data["cities"]:
                 city = storage.get("City", city_id)
                 for pla in city.places:
-                    list_places.append(pla)
+                    lista_ids_pl.add(pla.id)
+                lista_ids_iter = list(lista_ids_pl)
+                for pla in city.places:
+                    if pla.id in lista_ids_iter:
+                        list_places.append(pla)
+                        lista_ids_iter.remove(pla.id)
 
         if "cities" not in data and "states" not in data:
             for val in storage.all("Place").values():
