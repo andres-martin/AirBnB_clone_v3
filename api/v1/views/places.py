@@ -30,6 +30,7 @@ def place_search():
     """get City with his id"""
     list_places = []
     list_place = []
+    list_final = []
 
     if request.is_json:
         data = request.get_json()
@@ -37,24 +38,40 @@ def place_search():
         msg = "Not a JSON"
         return jsonify({"error": msg}), 400
 
-    for val in storage.all("Place").values():
-        list_place.append(val)
     if len(data) == 0:
         for val in storage.all("Place").values():
-            list_places.append(val.to_dict())
+            list_places.append(val)
     else:
+        lista_ids_pl = set()
         if "states" in data and len(data["states"]) > 0:
             for state_id in data["states"]:
                 place = storage.get("State", state_id)
                 for city in place.cities:
                     for pla in city.places:
-                        list_places.append(pla.to_dict())
+                        lista_ids_pl.add(pla.id)
+                    lista_ids_iter = list(lista_ids_pl)
+                    for pla in city.places:
+                        if pla.id in lista_ids_iter:
+                            list_places.append(pla)
+                            lista_ids_iter.remove(pla.id)
 
         if "cities" in data and len(data["cities"]) > 0:
             for city_id in data["cities"]:
                 city = storage.get("City", city_id)
                 for pla in city.places:
-                    list_places.append(pla.to_dict())
+                    lista_ids_pl.add(pla.id)
+                lista_ids_iter = list(lista_ids_pl)
+                for pla in city.places:
+                    if pla.id in lista_ids_iter:
+                        list_places.append(pla)
+                        lista_ids_iter.remove(pla.id)
+
+        if "cities" not in data and "states" not in data:
+            for val in storage.all("Place").values():
+                list_place.append(val)
+        else:
+            for val in list_places:
+                list_place.append(val)
 
         if "amenities" in data and len(data["amenities"]) > 0:
             amenities = set(list(a_id for a_id in data["amenities"]
@@ -75,9 +92,23 @@ def place_search():
 
                     if "amenities" in llave:
                         del llave["amenities"]
-                    list_places.append(llave)
+                    list_places.append(place)
 
-    return jsonify(list_places)
+    for pla in list_places:
+        llave = pla.to_dict()
+        if "amenities" in llave:
+            del llave["amenities"]
+        list_final.append(llave)
+
+    seen = set()
+    new_l = []
+    for d in list_final:
+        t = tuple(d.items())
+        if t not in seen:
+            seen.add(t)
+            new_l.append(d)
+
+    return jsonify(new_l)
 
 
 @app_views.route('/places/<place_id>', methods=['DELETE'])
