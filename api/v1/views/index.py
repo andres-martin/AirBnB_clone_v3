@@ -3,15 +3,18 @@
 from api.v1.views import app_views
 from flask import jsonify
 from models import storage
+from flasgger import swag_from
 
 
 @app_views.route('/status')
+@swag_from('./apidocs/status.yml')
 def status():
     """status render template for json"""
     return jsonify({"status": "OK"})
 
 
 @app_views.route('/stats')
+@swag_from('./apidocs/stats.yml')
 def stats():
     """status render template for json"""
     dict_objs = {'amenities': 'Amenity', 'cities': 'City', 'places': 'Place',
