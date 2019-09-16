@@ -27,7 +27,7 @@ def place_id(place_id):
 
 @app_views.route('/places_search', methods=['POST'])
 def place_search():
-    """get City with his id"""
+    """get places search with his id"""
     list_places = []
     list_place = []
     list_final = []
@@ -65,20 +65,20 @@ def place_search():
                 list_place.append(val)
 
         if "amenities" in data and len(data["amenities"]) > 0:
-            amenities = set(list(a_id for a_id in data["amenities"]
-                                 if storage.get('Amenity', a_id)))
+            amenities = set(list(amenid for amenid in data["amenities"]
+                                 if storage.get('Amenity', amenid)))
 
             for place in list_place:
-                pla_amen = None
+                plaamen = None
                 if (os.environ.get('HBNB_TYPE_STORAGE') ==
                         'db' and place.amenities):
-                    pla_amen = list(x.id for x in place.amenities)
+                    plaamen = list(pla.id for pla in place.amenities)
                 else:
                     if len(place.amenities) > 0:
-                        pla_amen = place.amenities
+                        plaamen = place.amenities
 
-                if (pla_amen and all(list(x in pla_amen
-                                          for x in amenities))):
+                if (plaamen and all(list(pla in plaamen
+                                          for pla in amenities))):
                     list_places.append(place)
 
     for pla in list_places:
@@ -92,8 +92,7 @@ def place_search():
 
     for pl in list_final:
         llave = pl.to_dict()
-        if "amenities" in llave:
-            del llave["amenities"]
+        del llave["amenities"]
         list_send.append(llave)
 
     return jsonify(list_send)
