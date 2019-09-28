@@ -78,7 +78,7 @@ def place_search():
                         plaamen = place.amenities
 
                 if (plaamen and all(list(pla in plaamen
-                                          for pla in amenities))):
+                                         for pla in amenities))):
                     list_places.append(place)
 
     for pla in list_places:
